@@ -1,0 +1,48 @@
+.pageWrapper {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5); /* Ваша оригинальная прозрачность */
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.title {
+  font-size: 2.2rem;
+  margin: 0 0 15px 0;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+.description {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  color: #e0e0e0;
+}
+
+.navigation {
+  margin-top: 20px;
+}
+
+.homeLink {
+  color: #00d1b2; /* Ваш оригинальный цвет ссылки */
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: color 0.2s ease;
+}
+
+.homeLink:hover {
+  color: #00b398;
+  text-decoration: underline;
+}

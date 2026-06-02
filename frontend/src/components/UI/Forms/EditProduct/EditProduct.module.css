@@ -1,0 +1,75 @@
+/* Включаем правильный расчет ширины с учетом внутренних отступов */
+.form *,
+.form *::before,
+.form *::after {
+    box-sizing: border-box;
+}
+
+.form input:not([type="checkbox"]),
+.form textarea,
+.form button {
+    width: 100%;
+    padding: 15px 5%;
+    margin-bottom: 10px;
+    border: 0;
+    color: #fff;
+    outline: none;
+    font-size: 15px;
+    border-radius: 6px; /* Небольшое скругление для современного вида */
+}
+
+/* Применяем ваш новый темно-бирюзовый цвет фона */
+.form input,
+.form textarea,
+.form button {
+    background-color: #134b57;
+}
+
+.form textarea {
+    resize: vertical; /* Позволяет растягивать текстовую область только по вертикали */
+}
+
+.form input[type="checkbox"] {
+    margin: 10px;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    accent-color: #00d1b2; /* Подсветка самой галочки */
+}
+
+/* Обертка для текста чекбокса (опционально) */
+.checkboxContainer {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #fff;
+    font-size: 15px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.form button {
+    width: 100%;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 500ms ease, background-color 200ms ease;
+}
+
+.form button:hover {
+    transform: scale(1.1);
+    background-color: #1a6271; /* Чуть более светлый оттенок при наведении для интерактивности */
+}
+
+.form button:active {
+    transform: scale(0.98); /* Эффект физического нажатия кнопки */
+}
+
+/* Группа кнопок, если у вас будет кнопка Отмена рядом с Сохранить */
+.buttonGroup {
+    display: flex;
+    gap: 10px;
+}
+
+/* Специфичный отступ для формы, если она вложена в блок с классом item */
+.item form {
+    margin-top: 20px;
+}

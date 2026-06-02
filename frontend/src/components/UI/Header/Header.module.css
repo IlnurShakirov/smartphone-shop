@@ -1,0 +1,55 @@
+/* Включаем правильный расчет ширины с учетом внутренних отступов */
+.header *,
+.header *::before,
+.header *::after {
+    box-sizing: border-box;
+}
+
+.header {
+  background-color: rgba(0, 0, 0, 0.85); /* Ваш оригинальный полупрозрачный фон */
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  justify-content: space-between;
+
+  /* Делаем шапку зафиксированной наверху при скролле (опционально) */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(5px); /* Эффект легкого размытия заднего плана */
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.leftSide {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logoImg {
+  height: 40px;
+  margin-right: 20px;
+  object-fit: contain;
+}
+
+.navigation {
+  display: flex;
+  gap: 25px;
+}
+
+/* ⚡ Добавляем стили для ссылок Link (в HTML они рендерятся как тег <a>) */
+.navigation a {
+  color: #b5b5b5; /* Приглушенный белый цвет для неактивных ссылок */
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 200ms ease;
+}
+
+/* Эффект при наведении на пункт меню */
+.navigation a:hover {
+  color: #00d1b2; /* Подсветка вашим фирменным бирюзовым цветом */
+}
+
+

@@ -1,0 +1,90 @@
+/* Включаем правильный расчет размеров с учетом внутренних отступов */
+.cardItem {
+  list-style: none;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+}
+
+/* ⚡ Ваши оригинальные стили для блока с иконками и названием */
+.controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+/* ⚡ Ваша плавная анимация прозрачности для иконок */
+.deleteIcon, .editIcon {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+/* ⚡ Ваш ховер-эффект */
+.deleteIcon:hover, .editIcon:hover {
+    opacity: 0.7;
+}
+
+.itemLink {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1.2rem;
+}
+
+.itemLink:hover {
+  color: #00d1b2;
+  text-decoration: underline;
+}
+
+/* Контейнер для центрирования изображения смартфона */
+.imgContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* Ваши стили для изображения из прошлого шага */
+.itemImg {
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+  margin: 20px 0;
+  background-color: #111; /* Темная подложка под гаджеты */
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.description {
+  font-size: 0.95rem;
+  color: #cccccc;
+  line-height: 1.4;
+}
+
+.price {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #00d1b2;
+}
+
+.availability {
+  font-size: 0.9rem;
+}
+
+.editFormWrapper {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+

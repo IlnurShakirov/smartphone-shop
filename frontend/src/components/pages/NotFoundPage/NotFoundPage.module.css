@@ -1,0 +1,39 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f8f9fa;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.centerBlock {
+  text-align: center;
+}
+
+.code {
+  font-size: 100px;
+  margin: 0;
+  color: #343a40;
+  line-height: 1;
+}
+
+.message {
+  font-size: 18px;
+  color: #6c757d;
+  margin: 10px 0 0 0;
+}
+
+.backLink {
+  display: inline-block;
+  margin-top: 24px;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.backLink:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
