@@ -21,12 +21,13 @@ services:
     container_name: shop_backend
     ports:
       - "8000:8000"
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
     environment:
       - DATABASE_URL=postgresql://shop_user:shop_password@postgres_db:5432/smartphone_shop
+      - SEQ_SERVER_URL=http://shop_seq:5341
     depends_on:
       postgres_db:
         condition: service_healthy
-    # ⚡ ДОБАВЛЕНО: Монтируем папку public бэкенда, чтобы сохраняемые картинки не пропадали
     volumes:
       - ./backend/public:/app/public
 
@@ -35,13 +36,26 @@ services:
     container_name: shop_frontend
     ports:
       - "5173:5173"
+    command: npm run dev -- --host 0.0.0.0
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://127.0.0.1:8000
     depends_on:
       - backend
 
+  seq:
+    image: datalust/seq:latest
+    container_name: shop_seq
+    ports:
+      - "8081:80"
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=true
+
 volumes:
   postgres_data:
+
+
+
