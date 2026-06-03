@@ -15,6 +15,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - shop_network
 
   backend:
     build: ./backend
@@ -30,6 +32,8 @@ services:
         condition: service_healthy
     volumes:
       - ./backend/public:/app/public
+    networks:
+      - shop_network
 
   frontend:
     build: ./frontend
@@ -44,6 +48,8 @@ services:
       - VITE_API_URL=http://127.0.0.1:8000
     depends_on:
       - backend
+    networks:
+      - shop_network
 
   seq:
     image: datalust/seq:latest
@@ -53,9 +59,16 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SEQ_FIRSTRUN_NOAUTHENTICATION=true
+    networks:
+      - shop_network
 
 volumes:
   postgres_data:
+
+networks:
+  shop_network:
+    driver: bridge
+
 
 
 

@@ -1,10 +1,11 @@
-# backend/app/main.py
 import os
+import datetime
 import shutil
 from typing import List
-from fastapi import FastAPI, HTTPException, status, Depends, File, UploadFile
+from fastapi import FastAPI, HTTPException, status, Depends, File, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import requests  # ⚡ Добавлено для отправки логов по сети Docker в Seq
 
 # Импортируем схемы и зависимости
 from app.schemas import ItemSchema, ItemCreateSchema, SiteDataSchema
@@ -26,6 +27,58 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 🌟 ЛОГИРОВАНИЕ В СЕРВЕР СТРУКТУРИРОВАННЫХ ЛОГОВ (SEQ) 🌟
+SEQ_URL = os.getenv("SEQ_SERVER_URL", "http://shop_seq:5341") + "/api/events/raw?clef"
+
+
+def log_to_seq(level: str, message: str, properties: dict = None):
+    """Отправляет структурированный лог в контейнер Seq по сети Docker"""
+    payload = {
+        "@t": datetime.datetime.utcnow().isoformat() + "Z",  # Метка времени UTC
+        "@l": level,  # Уровень лога (Information/Error)
+        "@m": message,  # Текст сообщения
+        "Application": "SmartphoneShopBackend",  # Свойство: Имя приложения
+        **(properties or {})  # Динамические свойства JSON
+    }
+    try:
+        requests.post(SEQ_URL, json=payload, timeout=0.5)
+    except Exception:
+        pass  # Игнорируем сбои сети, чтобы логирование не ломало работу сайта
+
+
+# ⚡ MIDDLEWARE ДЛЯ АВТОМАТИЧЕСКОГО СБОРА HTTP-ЛОГОВ
+@app.middleware("http")
+async def http_logging_middleware(request: Request, call_next):
+    start_time = datetime.datetime.utcnow()
+
+    # Обрабатываем сам запрос
+    response = await call_next(request)
+
+    # Рассчитываем время выполнения
+    duration = (datetime.datetime.utcnow() - start_time).total_seconds() * 1000.0
+
+    # Формируем свойства структурированного лога
+    log_properties = {
+        "Method": request.method,
+        "Path": request.url.path,
+        "StatusCode": response.status_code,
+        "ClientIP": request.client.host if request.client else "unknown",
+        "DurationMs": round(duration, 2)
+    }
+
+    # Выбираем уровень лога в зависимости от HTTP-статуса
+    log_level = "Information" if response.status_code < 400 else "Warning"
+
+    # Отправляем структурированное событие в Seq
+    log_to_seq(
+        level=log_level,
+        message=f"HTTP {request.method} {request.url.path} returned {response.status_code} in {round(duration, 2)}ms",
+        properties=log_properties
+    )
+
+    return response
+
 
 # --- ДИНАМИЧЕСКОЕ ПОДКЛЮЧЕНИЕ ПАПКИ PUBLIC ---
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))  # папка app
@@ -53,7 +106,6 @@ def get_site_data():
 
 
 # 🌟 ИЗОЛИРОВАННЫЙ ЭНДПОИНТ ДЛЯ ЗАГРУЗКИ КАРТИНКИ
-# Выведен на независимый префикс /media, чтобы не конфликтовать со слоями /items
 @app.post("/media/upload")
 def upload_product_image(file: UploadFile = File(...)):
     try:
@@ -66,8 +118,12 @@ def upload_product_image(file: UploadFile = File(...)):
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
+        # Логируем успешное сохранение файла
+        log_to_seq("Information", f"Файл {safe_filename} успешно сохранен на сервере", {"Filename": safe_filename})
+
         return {"imageUrl": f"static/images/items/{safe_filename}"}
     except Exception as e:
+        log_to_seq("Error", f"Ошибка сохранения файла: {str(e)}", {"Exception": str(e)})
         raise HTTPException(status_code=500, detail=f"Ошибка сохранения файла: {str(e)}")
 
 
@@ -80,13 +136,17 @@ def get_all_items(service: ItemService = Depends(get_item_service)):
 def get_single_item(item_id: str, service: ItemService = Depends(get_item_service)):
     item = service.get_item_by_id(item_id)
     if not item:
+        log_to_seq("Warning", f"Запрошен несуществующий товар с ID: {item_id}", {"ItemId": item_id})
         raise HTTPException(status_code=404, detail="Товар не найден")
     return item
 
 
 @app.post("/items", response_model=ItemSchema, status_code=status.HTTP_201_CREATED)
 def create_item(item: ItemCreateSchema, service: ItemService = Depends(get_item_service)):
-    return service.create_new_item(item.model_dump())
+    created_item = service.create_new_item(item.model_dump())
+    # Логируем создание нового устройства
+    log_to_seq("Information", f"Создан новый товар: {item.name}", {"ItemName": item.name, "Price": item.price})
+    return created_item
 
 
 @app.put("/items/{item_id}", response_model=ItemSchema)
@@ -102,6 +162,7 @@ def delete_item(item_id: str, service: ItemService = Depends(get_item_service)):
     success = service.delete_smartphone(item_id)
     if not success:
         raise HTTPException(status_code=404, detail="Товар не найден")
+    log_to_seq("Information", f"Товар удален из базы данных", {"DeletedItemId": item_id})
     return {"message": "Товар успешно удален"}
 
 
@@ -109,6 +170,7 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
+
 
 
 
